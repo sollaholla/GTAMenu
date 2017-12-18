@@ -1,0 +1,43 @@
+﻿namespace GTAMenu
+{
+    public enum MenuBannerType
+    {
+        InteractionMenu,
+        Michael,
+        Franklin,
+        Trevor,
+        Barber,
+        Barber2,
+        Barber3,
+        Barber4,
+        CarMod,
+        CarMod2,
+        ClubHouseMod,
+        ConvenienceStore,
+        Darts,
+        ExecutiveVehicleUpgrade,
+        GasStation,
+        GolfShop,
+        GunRunningGunMod,
+        GunClub,
+        HighEndFashion,
+        HighEndSalon,
+        ImportExportModGarage,
+        LiquorStore,
+        LiquorStore2,
+        LiquorStore3,
+        LowEndFashion,
+        LowEndFashion2,
+        MidFashion,
+        MovieMasks,
+        SmuglersHangar,
+        SuperMod,
+        Tattoos,
+        Tattoos2,
+        Tattoos3,
+        Tattoos4,
+        Tattoos5,
+        Tennis,
+        None = -1
+    }
+}
