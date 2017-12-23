@@ -30,6 +30,7 @@ namespace GTAMenu
         private int _consecutiveScrolls;
 
         private Scaleform _descriptionScaleform;
+        private Scaleform _instructionalButtonsScaleform;
 
         private bool _disposed;
 
@@ -132,6 +133,7 @@ namespace GTAMenu
         public void Init()
         {
             _descriptionScaleform = new Scaleform("TEXTFIELD");
+            _instructionalButtonsScaleform = new Scaleform("INSTRUCTIONAL_BUTTONS");
             _bannerDict = GetTextureDictForBannerType(BannerType, out _bannerSprite);
         }
 
@@ -171,8 +173,31 @@ namespace GTAMenu
                     NativeFunctions.DrawTextField(_descriptionScaleform.Handle, MenuItems[_selectedIndex].Description,
                         new PointF(MenuWidth / 2f + OffsetX, currentY + 7), new SizeF(MenuWidth, 0f));
 
+            DrawInstructionalButtons();
             HandleNavInput();
             HandleCameraRotation();
+        }
+
+        private void DrawInstructionalButtons()
+        {
+            if (MenuItems.Count <= 0) return;
+            Function.Call(Hash._0x0DF606929C105BE1, _instructionalButtonsScaleform.Handle, 255, 255, 255, 255, 0);
+            _instructionalButtonsScaleform.CallFunction("CLEAR_RENDER");
+            var count = 0;
+            if (MenuItems[_selectedIndex].Enabled)
+            {
+                _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 1);
+                _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavSelect), Game.GetGXTEntry("HUD_INPUT2"));
+                _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
+                count++;
+            }
+            _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavCancel), Game.GetGXTEntry("HUD_INPUT3"));
+            _instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+        }
+
+        private static string GetControlString(Control control)
+        {
+            return Function.Call<string>(Hash._0x0499D7B09FC9B407, 1, (int)control, 0);
         }
 
         private void HandleCameraRotation()
@@ -838,7 +863,10 @@ namespace GTAMenu
             if (_disposed) return;
 
             if (disposing)
+            {
                 _descriptionScaleform.Dispose();
+                _instructionalButtonsScaleform.Dispose();
+            }
 
             _disposed = true;
         }
