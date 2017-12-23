@@ -186,9 +186,7 @@ namespace GTAMenu
             var count = 0;
             if (MenuItems[_selectedIndex].Enabled)
             {
-                _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 1);
                 _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavSelect), Game.GetGXTEntry("HUD_INPUT2"));
-                _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
                 count++;
             }
             _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavCancel), Game.GetGXTEntry("HUD_INPUT3"));
