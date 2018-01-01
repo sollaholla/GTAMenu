@@ -80,11 +80,9 @@ namespace GTAMenu
 
         public Color DescriptionColor { get; set; }
 
-        public bool Visible
-        {
+        public bool Visible {
             get => _visible;
-            set
-            {
+            set {
                 if (_visible && !value)
                     OnMenuClosed();
 
@@ -190,13 +188,13 @@ namespace GTAMenu
             {
                 _mouseOnScreenEdge = true;
                 GameplayCamera.RelativeHeading -= 2.5f;
-                Function.Call(Hash._0x8DB8CFFD58B62552, (int) CursorSprite.RightArrow); // SET_CURSOR_SPRITE
+                Function.Call(Hash._0x8DB8CFFD58B62552, (int)CursorSprite.RightArrow); // SET_CURSOR_SPRITE
             }
             else if (x <= 0f)
             {
                 _mouseOnScreenEdge = true;
                 GameplayCamera.RelativeHeading += 2.5f;
-                Function.Call(Hash._0x8DB8CFFD58B62552, (int) CursorSprite.LeftArrow); // SET_CURSOR_SPRITE
+                Function.Call(Hash._0x8DB8CFFD58B62552, (int)CursorSprite.LeftArrow); // SET_CURSOR_SPRITE
             }
             else
             {
@@ -492,7 +490,7 @@ namespace GTAMenu
             _lastDrawableItemCount = drawCount;
 
             if (!overridenCursor && !_mouseOnScreenEdge)
-                Function.Call(Hash._0x8DB8CFFD58B62552, (int) CursorSprite.Normal); // SET_CURSOR_SPRITE
+                Function.Call(Hash._0x8DB8CFFD58B62552, (int)CursorSprite.Normal); // SET_CURSOR_SPRITE
             currentY += GetMenuItemOffsetHeight(drawCount);
         }
 
