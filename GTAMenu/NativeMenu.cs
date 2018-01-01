@@ -10,10 +10,14 @@ namespace GTAMenu
 {
     public class NativeMenu : IDisposable
     {
+        public event NativeMenuIndexChanged IndexChanged;
+        public event NativeMenuItemSelectedEvent ItemSelected;
+        public event NativeMenuMenuClosedEvent MenuClosed;
+        public event NativeMenuMenuOpenedEvent MenuOpened;
+
         public const float DescriptionTextScale = 0.35f;
         public const float DescriptionXOffset = 8f;
         public const float DescriptionYOffset = 5f;
-
         private const float ItemCountXOffset = 18;
         private const float MenuItemHeight = 44.2f;
         private const float MenuItemInteractionAreaRatio = 2.3f;
@@ -28,24 +32,18 @@ namespace GTAMenu
         private string _bannerDict;
         private string _bannerSprite;
         private int _consecutiveScrolls;
-
-        private Scaleform _descriptionScaleform;
-        private Scaleform _instructionalButtonsScaleform;
-
-        private bool _disposed;
-
         private int _inputWait;
         private bool _isUsingScrollBar;
         private int _lastDrawableItemCount;
-
         private bool _mouseOnScreenEdge;
         private int _scrollIndex;
-
         private int _selectedIndex;
-
         private bool _supressAudio;
-
         private bool _visible;
+
+        private Scaleform _descriptionScaleform;
+        private Scaleform _instructionalButtonsScaleform;
+        private bool _disposed;
 
         public NativeMenu(string title)
         {
@@ -116,20 +114,6 @@ namespace GTAMenu
 
         public int MaxDrawableItems { get; set; }
 
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        public event NativeMenuIndexChanged IndexChanged;
-        public event NativeMenuItemSelectedEvent ItemSelected;
-        public event NativeMenuMenuClosedEvent MenuClosed;
-        public event NativeMenuMenuOpenedEvent MenuOpened;
-
         public void Init()
         {
             _descriptionScaleform = new Scaleform("TEXTFIELD");
@@ -183,6 +167,7 @@ namespace GTAMenu
             if (MenuItems.Count <= 0) return;
             Function.Call(Hash._0x0DF606929C105BE1, _instructionalButtonsScaleform.Handle, 255, 255, 255, 255, 0);
             _instructionalButtonsScaleform.CallFunction("CLEAR_RENDER");
+            _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
             var count = 0;
             if (MenuItems[_selectedIndex].Enabled)
             {
@@ -448,7 +433,7 @@ namespace GTAMenu
             {
                 NativeFunctions.DrawRect(posX - new SizeF(0, halfHeight / 2), size - new SizeF(0, halfHeight),
                     HighlightColor());
-                if (!Game.IsControlPressed(2, Control.FrontendAccept)) return;
+                if (!Game.IsControlPressed(2, Control.CursorAccept)) return;
                 _consecutiveScrolls++;
                 _inputWait = Game.GameTime + GetScrollTimeMs();
                 DecreaseIndex();
@@ -459,7 +444,7 @@ namespace GTAMenu
             {
                 NativeFunctions.DrawRect(posX + new SizeF(0, halfHeight / 2), size - new SizeF(0, halfHeight),
                     HighlightColor());
-                if (!Game.IsControlPressed(2, Control.FrontendAccept)) return;
+                if (!Game.IsControlPressed(2, Control.CursorAccept)) return;
                 _consecutiveScrolls++;
                 _inputWait = Game.GameTime + GetScrollTimeMs();
                 IncreaseIndex();
@@ -511,8 +496,7 @@ namespace GTAMenu
             currentY += GetMenuItemOffsetHeight(drawCount);
         }
 
-        private void GetHoverStateOfMenuItem(float currentYPosition, int drawIndex, out bool hover,
-            out bool interactHover, out bool navRightHover)
+        private void GetHoverStateOfMenuItem(float currentYPosition, int drawIndex, out bool hover, out bool interactHover, out bool navRightHover)
         {
             hover = NativeFunctions.IsMouseInBounds(new PointF(OffsetX, currentYPosition + MenuItemHeight * drawIndex),
                 new SizeF(MenuWidth, MenuItemHeight));
@@ -531,8 +515,7 @@ namespace GTAMenu
                 Visible = false;
         }
 
-        private void HandleMenuItemInput(int index, NativeMenuItemBase menuItem, bool hover, bool interactHover,
-            bool navRightHover, bool selected)
+        private void HandleMenuItemInput(int index, NativeMenuItemBase menuItem, bool hover, bool interactHover, bool navRightHover, bool selected)
         {
             var canSelect = selected && menuItem.Enabled && !IsInputWaiting();
 
@@ -856,17 +839,32 @@ namespace GTAMenu
             _supressAudio = true;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
 
             if (disposing)
             {
                 _descriptionScaleform.Dispose();
+
                 _instructionalButtonsScaleform.Dispose();
             }
 
             _disposed = true;
+        }
+
+        ~NativeMenu()
+        {
+            Dispose(false);
         }
     }
 }

@@ -20,7 +20,9 @@ namespace GTAMenu
 
         public void ProcessMenus()
         {
-            foreach (var menu in _menus)
+            var menusCopy = _menus.ToArray();
+
+            foreach (var menu in menusCopy)
                 if (menu.Visible)
                     menu.Draw();
         }
