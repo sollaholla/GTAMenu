@@ -59,10 +59,13 @@
     <Compile Include="NativeMenuItemNavigateIndexEvent.cs" />
     <Compile Include="NativeMenuItemNavigateIndexEventArgs.cs" />
     <Compile Include="NativeMenuItemSelectedEvent.cs" />
+    <Compile Include="NativeMenuItemUnmanagedNavigateIndexEvent.cs" />
+    <Compile Include="NativeMenuItemUnmanagedNavigateIndexEventArgs.cs" />
     <Compile Include="NativeMenuListItem.cs" />
     <Compile Include="NativeMenuManager.cs" />
     <Compile Include="NativeMenuMenuClosedEvent.cs" />
     <Compile Include="NativeMenuMenuOpenedEvent.cs" />
+    <Compile Include="NativeMenuUnmanagedListItem.cs" />
     <Compile Include="NavigationMode.cs" />
     <Compile Include="ShopIcon.cs" />
     <Compile Include="MenuBannerType.cs" />
@@ -74,6 +77,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>COPY "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\scripts"
-COPY "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\scripts"</PostBuildEvent>
+COPY "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\scripts"
+COPY "$(TargetPath)" "C:\Users\sxnor\Documents\Visual Studio 2017\Lib"
+COPY "$(TargetDir)$(TargetName).pdb" "C:\Users\sxnor\Documents\Visual Studio 2017\Lib"</PostBuildEvent>
   </PropertyGroup>
 </Project>

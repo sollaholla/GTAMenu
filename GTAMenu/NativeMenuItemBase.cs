@@ -28,7 +28,7 @@ namespace GTAMenu
 
         public object Tag { get; set; }
 
-        public object Value { get; protected set; }
+        public object Value { get; set; }
 
         public string Text { get; }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace GTAMenu
 {
@@ -27,8 +28,14 @@ namespace GTAMenu
                     menu.Draw();
         }
 
-        public NativeMenu AddSubMenu(string menuTitle, string menuDescription, string itemText, string itemDescription,
-            NativeMenu parent)
+        public bool IsAnyMenuOpen()
+        {
+            var menusCopy = _menus.ToArray();
+
+            return menusCopy.Any(x => x.Visible);
+        }
+
+        public NativeMenu AddSubMenu(string menuTitle, string menuDescription, string itemText, string itemDescription, NativeMenu parent)
         {
             var item = new NativeMenuItemBase(itemText, itemDescription);
             var menu = new NativeMenu(menuTitle, menuDescription, parent.BannerType)
@@ -43,11 +50,13 @@ namespace GTAMenu
                 OffsetY = parent.OffsetY,
                 SoundSet = parent.SoundSet
             };
-            menu.MenuClosed += (nativeMenu, eventArgs) =>
+
+            menu.MenuBack += (nativeMenu, eventArgs) =>
             {
                 parent.SupressAudioNextCall();
                 parent.Visible = true;
             };
+
             parent.MenuItems.Add(item);
             item.Selected += (sender, args) =>
             {

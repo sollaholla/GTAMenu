@@ -10,6 +10,16 @@ namespace GTAMenu
     {
         private const int MaxStringLength = 99;
 
+        public static float MeasureStringWidth(string text, string label, Font font, float scale)
+        {
+            var res = NativeFunctions.GetScreenResolution(out _);
+            Function.Call(Hash._0x54CE8AC98E120CAB, label); // _BEGIN_TEXT_COMMAND_WIDTH
+            Function.Call(Hash._0x6C188BE134E074AA, text); // ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            Function.Call(Hash.SET_TEXT_FONT, (int)font);
+            Function.Call(Hash.SET_TEXT_SCALE, scale, scale);
+            return Function.Call<float>(Hash._0x85F061DA64ED2F67, 1) * res.Width; // _END_TEXT_COMMAND_GET_WIDTH
+        }
+
         public static bool HasTextureDictionaryLoaded(string dictionary)
         {
             return Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, dictionary);

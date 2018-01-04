@@ -13,6 +13,7 @@ namespace GTAMenu
         public event NativeMenuIndexChanged IndexChanged;
         public event NativeMenuItemSelectedEvent ItemSelected;
         public event NativeMenuMenuClosedEvent MenuClosed;
+        public event NativeMenuMenuClosedEvent MenuBack;
         public event NativeMenuMenuOpenedEvent MenuOpened;
 
         public const float DescriptionTextScale = 0.35f;
@@ -207,6 +208,7 @@ namespace GTAMenu
             if (Game.IsDisabledControlJustPressed(2, NavCancel) && !IsInputWaiting())
             {
                 Visible = false;
+                OnMenuBack();
                 return;
             }
 
@@ -510,7 +512,10 @@ namespace GTAMenu
         {
             if (isOverAnyItem) return;
             if (Game.IsDisabledControlPressed(2, Control.CursorAccept) && AllowClickOut)
+            {
+                OnMenuBack();
                 Visible = false;
+            }
         }
 
         private void HandleMenuItemInput(int index, NativeMenuItemBase menuItem, bool hover, bool interactHover, bool navRightHover, bool selected)
@@ -808,6 +813,12 @@ namespace GTAMenu
                 Audio.ReleaseSound(Audio.PlaySoundFrontend("SELECT", GetSoundSetForFrontEndAudio(SoundSet)));
             MenuOpened?.Invoke(this, EventArgs.Empty);
             _supressAudio = false;
+        }
+
+        protected virtual void OnMenuBack()
+        {
+            MenuBack?.Invoke(this, EventArgs.Empty);
+            OnMenuClosed();
         }
 
         protected virtual void OnNavLeftRight(NativeMenu sender, int leftRight)
