@@ -27,7 +27,7 @@ namespace GTAMenu
         private const Control NavDown = Control.PhoneDown;
         private const Control NavLeft = Control.PhoneLeft;
         private const Control NavRight = Control.PhoneRight;
-        private const Control NavSelect = Control.CreatorAccept;
+        private const Control NavSelect = Control.FrontendAccept;
         private const Control NavCancel = Control.PhoneCancel;
 
         private string _bannerDict;
@@ -39,6 +39,7 @@ namespace GTAMenu
         private bool _mouseOnScreenEdge;
         private int _scrollIndex;
         private int _selectedIndex;
+        private int _itemSelectDelay;
         private bool _supressAudio;
         private bool _visible;
 
@@ -91,6 +92,7 @@ namespace GTAMenu
                 {
                     OnMenuOpened();
                     _inputWait = Game.GameTime + 10;
+                    _itemSelectDelay = Game.GameTime + 100;
                 }
 
                 _visible = value;
@@ -165,15 +167,22 @@ namespace GTAMenu
         {
             if (MenuItems.Count <= 0) return;
             Function.Call(Hash._0x0DF606929C105BE1, _instructionalButtonsScaleform.Handle, 255, 255, 255, 255, 0);
-            _instructionalButtonsScaleform.CallFunction("CLEAR_RENDER");
+            _instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
             _instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
             var count = 0;
-            if (MenuItems[_selectedIndex].Enabled)
+            var nativeMenuItemBase = MenuItems[_selectedIndex];
+            if (nativeMenuItemBase.Enabled)
             {
                 _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavSelect), Game.GetGXTEntry("HUD_INPUT2"));
                 count++;
             }
             _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(NavCancel), Game.GetGXTEntry("HUD_INPUT3"));
+            count++;
+            foreach (var button in nativeMenuItemBase.CustomButtons)
+            {
+                _instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", count, GetControlString(button.Key), button.Value);
+                count++;
+            }
             _instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
         }
 
@@ -215,11 +224,11 @@ namespace GTAMenu
             if (Game.IsDisabledControlJustPressed(2, NavSelect))
             {
                 if (MenuItems.Count <= 0) return;
-                if (IsInputWaiting()) return;
+                if (IsInputWaiting() && Game.GameTime > _itemSelectDelay) return;
 
                 var item = MenuItems[_selectedIndex];
 
-                if (item.Enabled)
+                if (item.Enabled && Game.GameTime > _itemSelectDelay)
                     OnItemSelected(new NativeMenuItemEventArgs(item, _selectedIndex));
             }
             else if (
@@ -520,7 +529,7 @@ namespace GTAMenu
 
         private void HandleMenuItemInput(int index, NativeMenuItemBase menuItem, bool hover, bool interactHover, bool navRightHover, bool selected)
         {
-            var canSelect = selected && menuItem.Enabled && !IsInputWaiting();
+            var canSelect = selected && menuItem.Enabled && !IsInputWaiting() && Game.GameTime > _itemSelectDelay;
 
             // Nav left right.
             if (canSelect && menuItem.IgnoreClick)
@@ -562,7 +571,7 @@ namespace GTAMenu
                     _inputWait = Game.GameTime + 10;
                 }
             }
-            else if (_selectedIndex != index)
+            else if (_selectedIndex != index && Game.GameTime > _itemSelectDelay)
             {
                 var lastItem = MenuItems[_selectedIndex];
                 _selectedIndex = index;

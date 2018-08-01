@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using GTA;
 using GTA.Native;
 using Font = GTA.Font;
 
@@ -12,6 +14,7 @@ namespace GTAMenu
             Text = text;
             Description = description;
             Enabled = true;
+            CustomButtons = new Dictionary<Control, string>();
         }
 
         public NativeMenuItemBase(string text, string description, object value) :
@@ -41,10 +44,33 @@ namespace GTAMenu
         public CursorSprite InteractionCursor { get; set; }
 
         public ShopIcon ShopIcon { get; }
+
+        public Dictionary<Control, string> CustomButtons { get; set; }
+
         public event NativeMenuItemSelectedEvent Selected;
+
+        public event NativeMenuItemButtonDownEvent ButtonDown;
+
+        public event NativeMenuItemButtonUpEvent ButtonUp;
+
+        public event NativeMenuItemButtonEvent ButtonHeld;
 
         public void Draw(PointF position, SizeF size, bool selected, bool hover, bool hover2, ref bool overridenCursor)
         {
+            if (selected)
+            {
+                foreach (var button in CustomButtons)
+                {
+                    Game.DisableControlThisFrame(2, button.Key);
+                    if (Game.IsDisabledControlJustPressed(2, button.Key))
+                        OnButtonDown(this, new NativeMenuItemButtonEventArgs(this, button.Key));
+                    else if (Game.IsDisabledControlJustReleased(2, button.Key))
+                        OnButtonUp(this, new NativeMenuItemButtonEventArgs(this, button.Key));
+                    else if (Game.IsDisabledControlPressed(2, button.Key))
+                        OnButtonHeld(this, new NativeMenuItemButtonEventArgs(this, button.Key));
+                }
+            }
+
             var pos = new PointF(position.X + NativeMenu.DescriptionXOffset,
                 position.Y + NativeMenu.DescriptionYOffset);
             if (selected || hover)
@@ -200,6 +226,21 @@ namespace GTAMenu
 
         public virtual void OnNavLeftRight(NativeMenu sender, int menuItemIndex, int leftRight)
         {
+        }
+
+        protected virtual void OnButtonHeld(object sneder, NativeMenuItemButtonEventArgs e)
+        {
+            ButtonHeld?.Invoke(sneder, e);
+        }
+
+        protected virtual void OnButtonUp(object sneder, NativeMenuItemButtonEventArgs e)
+        {
+            ButtonUp?.Invoke(sneder, e);
+        }
+
+        protected virtual void OnButtonDown(object sneder, NativeMenuItemButtonEventArgs e)
+        {
+            ButtonDown?.Invoke(sneder, e);
         }
     }
 }
